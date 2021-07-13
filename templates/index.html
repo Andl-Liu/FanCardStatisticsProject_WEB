@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <title>评论区浓度查询器——首页</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+    <script>
+        //防止导航栏遮挡内容
+        let onResize = function() {
+            // apply dynamic padding at the top of the body according to the fixed navbar height
+            $("body").css("padding-top", $(".navbar-fixed-top").height());
+            $(".block").css("height", $(".navbar-fixed-top").height());
+        };
+
+        // attach the function to the window resize event
+        $(window).resize(onResize);
+
+        // call it also when the page is ready after load or reload
+        $(function() {
+            onResize();
+        });
+
+        //检验输入的内容是否满足格式要求
+        function check() {
+            let re = /^[B|b][V|v][0-9a-zA-Z]{10}/
+            let value = $("#bv").val()
+
+            if(re.test(value)) {
+                return true
+            }
+            else {
+                alert("请输入正确的BV号！")
+                return false
+            }
+        }
+
+    </script>
+
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                    <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="/">评论区浓度查询器</a>
+                    </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="row clearfix block">
+				<div class="col-md-12 column">
+				</div>
+			</div>
+			<div class="row clearfix block">
+				<div class="col-md-12 column">
+				</div>
+			</div>
+			<div class="row clearfix block">
+				<div class="col-md-12 column">
+				</div>
+			</div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-4 column">
+		    </div>
+            <div class="col-md-4 column">
+                <div style="margin: auto">
+                    <form role="form" action="/process">
+                        <label for="bv">请输入BV号: </label>
+                        <input type="text" id="bv" name="bv">
+                        <button type="submit" class="btn btn-success" onclick="return check();">一键查询</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-4 column">
+		    </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
