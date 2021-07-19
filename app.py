@@ -22,7 +22,7 @@ def process():
 
     # 从数据库中查询需要的数据
 
-    return "Hello"
+    return render_template("show.html", oid=oid)
 
 
 if __name__ == '__main__':

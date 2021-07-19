@@ -7,6 +7,20 @@
 	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+    <style>
+        body
+        {
+            text-align: center
+        }
+
+        .echart
+        {
+            width: 800px;
+            height: 600px;
+            margin: auto;
+        }
+    </style>
+
     <!-- 引入 ECharts 文件 -->
     <script src="..\static\echarts.min.js"></script>
 </head>
@@ -17,7 +31,6 @@
         let onResize = function() {
             // apply dynamic padding at the top of the body according to the fixed navbar height
             $("body").css("padding-top", $(".navbar-fixed-top").height());
-            $(".block").css("height", $(".navbar-fixed-top").height());
         };
 
         // attach the function to the window resize event
@@ -32,7 +45,7 @@
 
     </script>
 
-    <div class="container">
+    <div class="container" style="text-align: center">
         <div class="row clearfix">
             <div class="col-md-12 column">
                 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -44,42 +57,57 @@
                 </nav>
             </div>
 
+
             <div class="row clearfix block">
 				<div class="col-md-12 column">
+                    <div id="fanCardPie" class="echart"></div>
+                    <script>
+                        let fanCardPie = echarts.init(document.getElementById('fanCardPie'));
+
+                        fanCardPieOption = {
+                            title: {
+                                text: '粉丝装扮占比统计',
+                                left: 'center'
+                            },
+                            legend: {
+                                top: 'bottom'
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    mark: {show: true},
+                                    dataView: {show: true, readOnly: false},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            series: [
+                                {
+                                    type: 'pie',
+                                    radius: [50, 250],
+                                    center: ['50%', '50%'],
+                                    roseType: 'area',
+                                    itemStyle: {
+                                        borderRadius: 8
+                                    },
+                                    data: [
+                                        {value: 40, name: 'rose 1'},
+                                        {value: 38, name: 'rose 2'},
+                                        {value: 32, name: 'rose 3'},
+                                        {value: 30, name: 'rose 4'},
+                                        {value: 28, name: 'rose 5'},
+                                        {value: 26, name: 'rose 6'},
+                                        {value: 22, name: 'rose 7'},
+                                        {value: 18, name: 'rose 8'}
+                                    ]
+                                }
+                            ]
+                        };
+
+                        fanCardPie.setOption(fanCardPieOption);
+                    </script>
 				</div>
 			</div>
-
-                <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-                <div id="main" style="width: 600px;height:400px;"></div>
-                <script type="text/javascript">
-                    // 基于准备好的dom，初始化echarts实例
-                    var myChart = echarts.init(document.getElementById('main'));
-
-                    // 指定图表的配置项和数据
-                    var option = {
-                        title: {
-                            text: 'ECharts 入门示例'
-                        },
-                        tooltip: {},
-                        legend: {
-                            data:['销量']
-                        },
-                        xAxis: {
-                            data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-                        },
-                        yAxis: {},
-                        series: [{
-                            name: '销量',
-                            type: 'bar',
-                            data: [5, 20, 36, 10, 10, 20]
-                        }]
-                    };
-
-                    // 使用刚指定的配置项和数据显示图表。
-                    myChart.setOption(option);
-                </script>
-
-
         </div>
     </div>
 

@@ -109,9 +109,10 @@ def crawl(oid):
 
 # 处理数据
 def process_data(reps, cursor, table_name, floor=0):
-    print(reps.url)
+    # print(reps.url)
     # json数据
     comments_json = reps.json()
+    # print(comments_json)
 
     # 当"replies"对应的值为空值时，到达评论区底部停止爬取
     if not comments_json["data"].get("replies", 0):
@@ -160,10 +161,10 @@ def process_data(reps, cursor, table_name, floor=0):
         # 评论内容
         dic["content"] = comment["content"]["message"].replace('\'', '‘')
 
-        # sql_find_floor = 'select count(*) from %s where floor=%d' % (table_name, dic["floor"])
-        # cursor.execute(sql_find_floor)
-        # if cursor.fetchall()[0][0] != 0:
-        #     return True, floor
+        sql_find_floor = 'select count(*) from %s where floor=%d' % (table_name, dic["floor"])
+        cursor.execute(sql_find_floor)
+        if cursor.fetchall()[0][0] != 0:
+            return True, floor
 
         sql_insert = '''
             insert into %s(floor, ctime, user_name, user_sex, user_level, vip_level, card_name, card_number, up_name, comment_content)
