@@ -1,3 +1,4 @@
+import math
 import random
 import sqlite3
 
@@ -31,6 +32,7 @@ def guid():
             uid += '-'
             continue
         uid += pool[random.randint(0, len(pool) - 1)]
+    print(uid)
     return uid
 
 

@@ -1,4 +1,3 @@
-import math
 import sqlite3
 import random
 from time import sleep

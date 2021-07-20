@@ -35,7 +35,7 @@
                 setInterval(function () {
                     $.getJSON('/show_process?uid={{ uid }}',
                     function (json) {
-                        $('#loading').html('已处理第' + json['floor'] + '的评论');
+                        $('#loading').html('已处理第' + json['floor'] + '楼的评论');
                     })
                 },500)
                 return true
@@ -80,9 +80,10 @@
 		    </div>
             <div class="col-md-4 column">
                 <div style="margin: auto">
-                    <form role="form" action="/process?uid={{ uid }}">
+                    <form role="form" action="/process">
                         <label for="bv">请输入BV号: </label>
                         <input type="text" id="bv" name="bv">
+                        <input value="{{ uid }}" hidden name="uid">
                         <button id="submit" type="submit" class="btn btn-success" onclick="return check();">一键查询</button>
                     </form>
                 </div>

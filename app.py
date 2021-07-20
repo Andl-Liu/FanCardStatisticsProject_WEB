@@ -16,9 +16,8 @@ def index():
 def process():
     # 将bv号转化为对应的av号的后缀
     bv = request.args.get("bv")
-    uid = request.args.get('uid')
+    uid = request.args.get("uid")
     oid = BvToAv(bv)
-
     # 爬取评论数据并将数据储存在数据库
     start_time, end_time = crawl(oid=oid, uid=uid)
 
