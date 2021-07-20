@@ -31,6 +31,13 @@
             let value = $("#bv").val()
 
             if(re.test(value)) {
+                $('#loading').css('visibility', 'visible');
+                setInterval(function () {
+                    $.getJSON('/show_process?uid={{ uid }}',
+                    function (json) {
+                        $('#loading').html('已处理第' + json['floor'] + '的评论');
+                    })
+                },500)
                 return true
             }
             else {
@@ -73,15 +80,21 @@
 		    </div>
             <div class="col-md-4 column">
                 <div style="margin: auto">
-                    <form role="form" action="/process">
+                    <form role="form" action="/process?uid={{ uid }}">
                         <label for="bv">请输入BV号: </label>
                         <input type="text" id="bv" name="bv">
-                        <button type="submit" class="btn btn-success" onclick="return check();">一键查询</button>
+                        <button id="submit" type="submit" class="btn btn-success" onclick="return check();">一键查询</button>
                     </form>
                 </div>
             </div>
             <div class="col-md-4 column">
 		    </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 column">
+                <p id="loading" style="visibility: hidden;align-content: center"></p>
+            </div>
         </div>
     </div>
 
