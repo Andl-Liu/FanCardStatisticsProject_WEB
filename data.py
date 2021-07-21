@@ -32,7 +32,7 @@ def guid():
             uid += '-'
             continue
         uid += pool[random.randint(0, len(pool) - 1)]
-    print(uid)
+    # print(uid)
     return uid
 
 
