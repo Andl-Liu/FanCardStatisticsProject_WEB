@@ -1,6 +1,9 @@
+import os
+
 from flask import Flask, render_template, request, jsonify
 from crawler import *
 from data import *
+from wordclouds import *
 
 app = Flask(__name__)
 
@@ -41,6 +44,23 @@ def show_process():
     floor = get_process(uid=uid)
     print(floor)
     return jsonify({'floor': floor})
+
+
+# 获取词云
+@app.route('/get_wordcloud')
+def get_wordcloud():
+    oid = request.args.get('oid')
+    ctime = request.args.get('ctime')
+    last_time = request.args.get('last_time')
+    # 删除掉不需要的文件
+    file_list = os.listdir('./static/wordclouds')
+    for file in file_list:
+        if '%s_%s' % (oid, last_time) in file:
+            os.remove('./static/wordclouds/' + file)
+            break
+    # 生成词云
+    generate_wordcloud(oid=oid, ctime=ctime)
+    return jsonify({'img_url': '../static/wordclouds/%s_%s.jpg' % (oid, ctime)})
 
 
 if __name__ == '__main__':

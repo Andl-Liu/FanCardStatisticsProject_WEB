@@ -8,6 +8,7 @@ import requests
 progress_data = {}
 
 
+# 随机产生一个user_agent
 def get_ua():
     user_agents = [
         'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36 OPR/26.0.1656.60',
@@ -82,10 +83,12 @@ def crawl(oid, uid):
         # 更新参数
         params["next"] = page
         progress_data[uid] = page
+        headers['User_Agent'] = get_ua()
         if sleep_point == 0:
             sleep_point = page
         # 每爬取500条左右的评论，休眠5s
         if sleep_point - page >= 500:
+            print('休息5s')
             sleep_point = page
             sleep(5)
         # 获取评论
@@ -94,11 +97,14 @@ def crawl(oid, uid):
         (isOver, page) = process_data(reps=response, cursor=cursor, table_name=table_name)
         response.close()
 
+    # 获取最早评论的时间和最晚评论的时间
     cursor.execute(sql_find_max)
     end_time = cursor.fetchall()[0][0]
     cursor.execute(sql_find_min)
     start_time = cursor.fetchall()[0][0]
+    # 将变动提交的数据库
     conn.commit()
+    cursor.close()
     conn.close()
     return start_time, end_time
 
@@ -157,6 +163,7 @@ def process_data(reps, cursor, table_name, floor=0):
         # 评论内容
         dic["content"] = comment["content"]["message"].replace('\'', '‘')
 
+        # 当获取到数据库中已经存在的评论的时候，停止查询
         sql_find_floor = 'select count(*) from %s where floor=%d' % (table_name, dic["floor"])
         cursor.execute(sql_find_floor)
         if cursor.fetchall()[0][0] != 0:

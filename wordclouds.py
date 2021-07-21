@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import sqlite3
 
 
+# 生成词云
 def generate_wordcloud(oid, ctime):
     database_path = "./static/comments.db"
     connect = sqlite3.connect(database_path)

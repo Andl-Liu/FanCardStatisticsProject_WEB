@@ -111,6 +111,9 @@
                         </div>
                         <div>
                             <ul class="nav navbar-nav navbar-right">
+                                <li>
+                                    <a href="https://github.com/Andl-Liu/FanCardStatisticsProject_WEB" target="_blank">Github</a>
+                                </li>
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                         设置
@@ -138,8 +141,12 @@
             <div class="col-md-12 column">
                 <div id="fanCardPie" class="echart"></div>
                 <script>
+                    // 初始化图表
                     let fanCardPie = echarts.init(document.getElementById('fanCardPie'));
+                    // 记录现在显示的评论截至的时间
+                    let now_time = {{ end_time }};
 
+                    // 图表的基础设置
                     let fanCardPieOption = {
                         title: {
                                 text: '粉丝装扮占比统计',
@@ -183,9 +190,12 @@
                         ]
                     };
                     fanCardPie.setOption(fanCardPieOption);
+                    //显示加载中
                     fanCardPie.showLoading();
 
+                    //用来记录没有粉丝装扮的评论的数量
                     let noFanCard = 0;
+                    //获取数据，并更新图表
                     $.getJSON('/get_data' + '?obj=card_name&oid={{ oid }}&ctime={{ end_time }}',
                         function (json) {
                             fanCardPieOption['series'][0]['data'] = json['data'];
@@ -247,7 +257,7 @@
                         return num;
                     }
 
-
+                    // 滑块的设置
                     $(document).ready(function(){
                         let rangeSlider = function(){
                             let slider = $('.range-slider'),
@@ -255,15 +265,18 @@
                                 value = $('.range-value');
                             slider.each(function(){
                                 value.each(function(){
+                                    // 显示时间
                                     let value = $(this).prev().attr('value');
                                     let date = getMyDate(parseInt(value) * 1000)
                                     $(this).html(date);
                                 });
                                 range.on('input', function(){
+                                    // 拖动进度条后更新显示的时间
                                     let date = getMyDate(parseInt(this.value) * 1000);
                                     $(this).next(value).html(date);
                                 });
                                 range.on('click', function () {
+                                    // 拖动进度条后更新数据，并更新图表
                                     $.getJSON('/get_data' + '?obj=card_name&oid={{ oid }}&ctime=' + this.value,
                                         function (json) {
                                             fanCardPie.showLoading();
@@ -280,6 +293,15 @@
                                             fanCardPie.setOption(fanCardPieOption);
                                         }
                                     );
+                                    // 更新词云图
+                                    $('#wordcloud').css('visibility', 'hidden');
+                                    $.getJSON('/get_wordcloud?oid={{ oid }}&ctime=' + this.value + '&last_time=' + now_time,
+                                        function (json) {
+                                            $('#wordcloud').attr('src', json['img_url']);
+                                            $('#wordcloud').css('visibility', 'visible');
+                                        });
+                                    //更新评论截止时间
+                                    now_time = this.value;
                                 });
                             });
                         };
@@ -287,6 +309,30 @@
                     });
                 </script>
             </div>
+        </div>
+
+        <!-- 显示词云图片 -->
+        <div class="row clearfix block">
+            <div class="col-md-12 column">
+                <img src="" alt="词云" style="margin: auto;visibility: hidden" id="wordcloud" width="640px" height="480px">
+
+                <script>
+                    $(document).ready(function () {
+                        // 显示并更新词云
+                        $.getJSON('/get_wordcloud?oid={{ oid }}&ctime={{ end_time }}&last_time=' + now_time,
+                        function (json) {
+                            $('#wordcloud').attr('src', json['img_url']);
+                            $('#wordcloud').css('visibility', 'visible');
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+
+        <!-- 放广告 -->
+        <div style="height: 500px"></div>
+        <div align="center">
+            <img src="../static/ad.png" height="150" width="210">
         </div>
 
         <!-- END OF CONTAINER -->

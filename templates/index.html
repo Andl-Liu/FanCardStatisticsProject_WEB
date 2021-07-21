@@ -31,6 +31,7 @@
             let value = $("#bv").val()
 
             if(re.test(value)) {
+                // 显示处理进度
                 $('#loading').css('visibility', 'visible');
                 setInterval(function () {
                     $.getJSON('/show_process?uid={{ uid }}',
@@ -53,9 +54,16 @@
             <div class="col-md-12 column">
                 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
                     <div class="container-fluid">
-                    <div class="navbar-header">
-                        <a class="navbar-brand" href="/">评论区浓度查询器</a>
-                    </div>
+                        <div class="navbar-header">
+                            <a class="navbar-brand" href="/">评论区浓度查询器</a>
+                        </div>
+                        <div>
+                            <ul class="nav navbar-nav navbar-right">
+                                <li>
+                                    <a href="https://github.com/Andl-Liu/FanCardStatisticsProject_WEB" target="_blank">Github</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </nav>
             </div>
@@ -97,6 +105,13 @@
                 <p id="loading" style="visibility: hidden;align-content: center"></p>
             </div>
         </div>
+
+        <!-- 放广告 -->
+        <div style="height: 500px"></div>
+        <div align="center">
+            <img src="../static/ad.png" height="150" width="210">
+        </div>
+
     </div>
 
 
