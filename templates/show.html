@@ -275,34 +275,66 @@
                                     let date = getMyDate(parseInt(this.value) * 1000);
                                     $(this).next(value).html(date);
                                 });
-                                range.on('click', function () {
-                                    // 拖动进度条后更新数据，并更新图表
-                                    $.getJSON('/get_data' + '?obj=card_name&oid={{ oid }}&ctime=' + this.value,
-                                        function (json) {
-                                            fanCardPie.showLoading();
-                                            fanCardPieOption['series'][0]['data'] = json['data'];
-                                            for(let i = 0;i < fanCardPieOption['series'][0]['data'].length;i++) {
-                                                if(fanCardPieOption['series'][0]['data'][i]['name'] == '无') {
-                                                    noFanCard = fanCardPieOption['series'][0]['data'][i]['value'];
-                                                    fanCardPieOption['series'][0]['data'][i]['value'] = 0;
-                                                    break;
+                                if(navigator.userAgent.match(/mobile/i)) {
+                                    range.on('tap', function () {
+                                        // 拖动进度条后更新数据，并更新图表
+                                        $.getJSON('/get_data' + '?obj=card_name&oid={{ oid }}&ctime=' + this.value,
+                                            function (json) {
+                                                fanCardPie.showLoading();
+                                                fanCardPieOption['series'][0]['data'] = json['data'];
+                                                for(let i = 0;i < fanCardPieOption['series'][0]['data'].length;i++) {
+                                                    if(fanCardPieOption['series'][0]['data'][i]['name'] == '无') {
+                                                        noFanCard = fanCardPieOption['series'][0]['data'][i]['value'];
+                                                        fanCardPieOption['series'][0]['data'][i]['value'] = 0;
+                                                        break;
+                                                    }
                                                 }
+                                                fanCardPieOption['legend']['data'] = json['scroll'];
+                                                fanCardPie.hideLoading();
+                                                fanCardPie.setOption(fanCardPieOption);
                                             }
-                                            fanCardPieOption['legend']['data'] = json['scroll'];
-                                            fanCardPie.hideLoading();
-                                            fanCardPie.setOption(fanCardPieOption);
-                                        }
-                                    );
-                                    // 更新词云图
-                                    $('#wordcloud').css('visibility', 'hidden');
-                                    $.getJSON('/get_wordcloud?oid={{ oid }}&ctime=' + this.value + '&last_time=' + now_time,
-                                        function (json) {
-                                            $('#wordcloud').attr('src', json['img_url']);
-                                            $('#wordcloud').css('visibility', 'visible');
-                                        });
-                                    //更新评论截止时间
-                                    now_time = this.value;
-                                });
+                                        );
+                                        // 更新词云图
+                                        $('#wordcloud').css('visibility', 'hidden');
+                                        $.getJSON('/get_wordcloud?oid={{ oid }}&ctime=' + this.value + '&last_time=' + now_time,
+                                            function (json) {
+                                                $('#wordcloud').attr('src', json['img_url']);
+                                                $('#wordcloud').css('visibility', 'visible');
+                                            });
+                                        //更新评论截止时间
+                                        now_time = this.value;
+                                    });
+                                }
+                                else {
+                                    range.on('click', function () {
+                                        // 拖动进度条后更新数据，并更新图表
+                                        $.getJSON('/get_data' + '?obj=card_name&oid={{ oid }}&ctime=' + this.value,
+                                            function (json) {
+                                                fanCardPie.showLoading();
+                                                fanCardPieOption['series'][0]['data'] = json['data'];
+                                                for(let i = 0;i < fanCardPieOption['series'][0]['data'].length;i++) {
+                                                    if(fanCardPieOption['series'][0]['data'][i]['name'] == '无') {
+                                                        noFanCard = fanCardPieOption['series'][0]['data'][i]['value'];
+                                                        fanCardPieOption['series'][0]['data'][i]['value'] = 0;
+                                                        break;
+                                                    }
+                                                }
+                                                fanCardPieOption['legend']['data'] = json['scroll'];
+                                                fanCardPie.hideLoading();
+                                                fanCardPie.setOption(fanCardPieOption);
+                                            }
+                                        );
+                                        // 更新词云图
+                                        $('#wordcloud').css('visibility', 'hidden');
+                                        $.getJSON('/get_wordcloud?oid={{ oid }}&ctime=' + this.value + '&last_time=' + now_time,
+                                            function (json) {
+                                                $('#wordcloud').attr('src', json['img_url']);
+                                                $('#wordcloud').css('visibility', 'visible');
+                                            });
+                                        //更新评论截止时间
+                                        now_time = this.value;
+                                    });
+                                }
                             });
                         };
                         rangeSlider();

@@ -1,4 +1,5 @@
 import os
+from json import load, dump
 
 from flask import Flask, render_template, request, jsonify
 from crawler import *
@@ -11,7 +12,11 @@ app = Flask(__name__)
 # 首页
 @app.route('/')
 def index():
-    return render_template("index.html", uid=guid())
+    with open('./static/counter.json') as f:
+        cnt = load(f) + 1
+        with open('./static/counter.json', 'w') as f1:
+            dump(cnt, f1)
+    return render_template("index.html", uid=guid(), cnt=cnt)
 
 
 # 爬取数据，显示页面
@@ -42,7 +47,7 @@ def get_data_web():
 def show_process():
     uid = request.args.get('uid')
     floor = get_process(uid=uid)
-    print(floor)
+    # print(floor)
     return jsonify({'floor': floor})
 
 
@@ -64,4 +69,4 @@ def get_wordcloud():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, port=8888, host='0.0.0.0')

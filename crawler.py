@@ -6,6 +6,8 @@ import requests
 
 # 存储进度数据
 progress_data = {}
+# 储存正在进行爬取的视频和对应uid
+video_and_uid = {}
 
 
 # 随机产生一个user_agent
@@ -34,6 +36,15 @@ def get_ua():
 
 
 def crawl(oid, uid):
+    # 首先判断该视频有没有正在被爬取
+    if (oid in video_and_uid.keys()) and (video_and_uid[oid] != uid):
+        while video_and_uid[oid] != '':
+            progress_data[uid] = progress_data[video_and_uid[oid]]
+            sleep(1)
+
+    # 该视频的评论该uid的进程正在爬
+    video_and_uid[oid] = uid
+
     url = "https://api.bilibili.com/x/v2/reply/main"
     database_path = "./static/comments.db"
 
@@ -106,6 +117,7 @@ def crawl(oid, uid):
     conn.commit()
     cursor.close()
     conn.close()
+    video_and_uid[oid] = ''
     return start_time, end_time
 
 
