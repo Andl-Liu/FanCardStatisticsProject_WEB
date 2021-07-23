@@ -276,7 +276,7 @@
                                     $(this).next(value).html(date);
                                 });
                                 if(navigator.userAgent.match(/mobile/i)) {
-                                    range.on('tap', function () {
+                                    range.on('touchend', function () {
                                         // 拖动进度条后更新数据，并更新图表
                                         $.getJSON('/get_data' + '?obj=card_name&oid={{ oid }}&ctime=' + this.value,
                                             function (json) {
