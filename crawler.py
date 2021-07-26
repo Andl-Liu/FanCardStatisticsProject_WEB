@@ -1,5 +1,6 @@
 import sqlite3
 import random
+from queue import Queue
 from time import sleep
 
 import requests
@@ -8,6 +9,10 @@ import requests
 progress_data = {}
 # 储存正在进行爬取的视频和对应uid
 video_and_uid = {}
+# uid队列
+uid_queue = Queue()
+# uid队列标记
+uid_queue_flag = {}
 
 
 # 随机产生一个user_agent
@@ -36,6 +41,14 @@ def get_ua():
 
 
 def crawl(oid, uid):
+    # 添加到队列
+    uid_queue.put(uid)
+    progress_data[uid] = 0
+    uid_queue_flag[uid] = True
+    # 判断该uid是否到队列头
+    while uid_queue[0] != uid:
+        sleep(1)
+    uid_queue_flag[uid] = False
     # 首先判断该视频有没有正在被爬取
     if (oid in video_and_uid.keys()) and (video_and_uid[oid] != uid):
         while video_and_uid[oid] != '':
@@ -118,6 +131,7 @@ def crawl(oid, uid):
     cursor.close()
     conn.close()
     video_and_uid[oid] = ''
+    uid_queue.get()
     return start_time, end_time
 
 
@@ -196,4 +210,4 @@ def process_data(reps, cursor, table_name, floor=0):
 
 # 获取进度
 def get_process(uid):
-    return progress_data[uid]
+    return progress_data[uid], uid_queue_flag[uid]

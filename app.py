@@ -46,9 +46,9 @@ def get_data_web():
 @app.route('/show_process')
 def show_process():
     uid = request.args.get('uid')
-    floor = get_process(uid=uid)
+    floor, flag = get_process(uid=uid)
     # print(floor)
-    return jsonify({'floor': floor})
+    return jsonify({'floor': floor, 'flag': flag})
 
 
 # 获取词云

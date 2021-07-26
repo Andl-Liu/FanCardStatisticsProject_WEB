@@ -36,7 +36,10 @@
                 setInterval(function () {
                     $.getJSON('/show_process?uid={{ uid }}',
                     function (json) {
-                        $('#loading').html('已处理第' + json['floor'] + '楼的评论');
+                        if(json['flag'] == 'True')
+                            $('#loading').html('已添加进队列，正在排队中');
+                        else
+                            $('#loading').html('已处理第' + json['floor'] + '楼的评论');
                     })
                 },500)
                 return true
@@ -102,7 +105,7 @@
 
         <div class="row">
             <div class="col-md-12 column">
-                <p id="loading" style="visibility: hidden;align-content: center"></p>
+                <p id="loading" style="visibility: hidden"></p>
             </div>
         </div>
 
