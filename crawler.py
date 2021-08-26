@@ -1,6 +1,5 @@
 import sqlite3
 import random
-from queue import Queue
 from time import sleep
 
 import requests
@@ -9,10 +8,6 @@ import requests
 progress_data = {}
 # 储存正在进行爬取的视频和对应uid
 video_and_uid = {}
-# uid队列
-uid_queue = Queue()
-# uid队列标记
-uid_queue_flag = {}
 
 
 # 随机产生一个user_agent
@@ -41,14 +36,6 @@ def get_ua():
 
 
 def crawl(oid, uid):
-    # 添加到队列
-    uid_queue.put(uid)
-    progress_data[uid] = 0
-    uid_queue_flag[uid] = True
-    # 判断该uid是否到队列头
-    while uid_queue[0] != uid:
-        sleep(1)
-    uid_queue_flag[uid] = False
     # 首先判断该视频有没有正在被爬取
     if (oid in video_and_uid.keys()) and (video_and_uid[oid] != uid):
         while video_and_uid[oid] != '':
@@ -84,7 +71,7 @@ def crawl(oid, uid):
         create table IF not exists %s
         (
         id integer primary key autoincrement ,
-        floor integer ,
+        rpid text,
         ctime integer ,
         user_name text,
         user_sex text,
@@ -108,17 +95,16 @@ def crawl(oid, uid):
         params["next"] = page
         progress_data[uid] = page
         headers['User_Agent'] = get_ua()
-        if sleep_point == 0:
-            sleep_point = page
         # 每爬取500条左右的评论，休眠5s
-        if sleep_point - page >= 500:
+        if page - sleep_point >= 500:
             print('休息5s')
             sleep_point = page
             sleep(5)
         # 获取评论
         response = requests.get(url=url, params=params, headers=headers)
         # 加工数据
-        (isOver, page) = process_data(reps=response, cursor=cursor, table_name=table_name)
+        (isOver, cnt) = process_data(reps=response, cursor=cursor, table_name=table_name)
+        page += cnt
         response.close()
 
     # 获取最早评论的时间和最晚评论的时间
@@ -131,7 +117,6 @@ def crawl(oid, uid):
     cursor.close()
     conn.close()
     video_and_uid[oid] = ''
-    uid_queue.get()
     return start_time, end_time
 
 
@@ -145,16 +130,22 @@ def process_data(reps, cursor, table_name, floor=0):
     # 当"replies"对应的值为空值时，到达评论区底部停止爬取
     if not comments_json["data"].get("replies", 0):
         return True, floor
-
     comments_json = comments_json["data"]["replies"]
     # 用于储存需要的评论数据
     dic = {}
+    cnt = 0
 
     for comment in comments_json:
+        cnt += 1
         # print(comment["floor"])
+        # 20210826 楼层被取消
         # 楼层
-        dic["floor"] = comment["floor"]
-        floor = comment["floor"]
+        # print(comment["floor"])
+        # dic["floor"] = comment["floor"]
+        # floor = comment["floor"]
+        # 评论id
+        dic["rpid"] = comment["rpid"]
+        rpid = comment["rpid"]
         # 评论时间
         dic["ctime"] = comment["ctime"]
 
@@ -190,24 +181,25 @@ def process_data(reps, cursor, table_name, floor=0):
         dic["content"] = comment["content"]["message"].replace('\'', '‘')
 
         # 当获取到数据库中已经存在的评论的时候，停止查询
-        sql_find_floor = 'select count(*) from %s where floor=%d' % (table_name, dic["floor"])
+        sql_find_floor = 'select count(*) from %s where rpid=%s' % (table_name, dic["rpid"])
         cursor.execute(sql_find_floor)
         if cursor.fetchall()[0][0] != 0:
-            return True, floor
+            return True, rpid
 
         sql_insert = '''
-            insert into %s(floor, ctime, user_name, user_sex, user_level, vip_level, card_name, card_number, up_name, comment_content)
-            values(%d, %d, '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s')
+            insert into %s(rpid, ctime, user_name, user_sex, user_level, vip_level, card_name, card_number, up_name, comment_content)
+            values(%s, %d, '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s')
         ''' % (
-        table_name, dic["floor"], dic["ctime"], dic["user_name"], dic["user_sex"], dic["user_level"], dic["vip_level"],
-        dic["fanCard_name"], dic["fanCard_id"], dic["fanCard_up"], dic["content"])
+            table_name, dic["rpid"], dic["ctime"], dic["user_name"], dic["user_sex"], dic["user_level"],
+            dic["vip_level"],
+            dic["fanCard_name"], dic["fanCard_id"], dic["fanCard_up"], dic["content"])
         # print(sql_insert)
         cursor.execute(sql_insert)
 
-    print(f"已处理至{floor}")
-    return False, floor
+    print(f"已处理{rpid}")
+    return False, cnt
 
 
 # 获取进度
 def get_process(uid):
-    return progress_data[uid], uid_queue_flag[uid]
+    return progress_data[uid]
